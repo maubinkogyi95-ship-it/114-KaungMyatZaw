@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ဆဌမတန်း မြန်မာစာ - ပိတောက်မယ်</title>
+    <!-- Chart.js library for graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Padauk', 'Pyidaungsu', sans-serif;
+        }
+        body {
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #d97706;
+            margin-bottom: 20px;
+        }
+        /* Toggle Button */
+        .toggle-btn {
+            display: block;
+            width: 100%;
+            background-color: #f59e0b;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+            text-align: center;
+        }
+        .toggle-btn:hover {
+            background-color: #d97706;
+        }
+        /* Poem Section */
+        .poem-container {
+            display: none;
+            background-color: #fffbe1;
+            border-left: 5px solid #f59e0b;
+            padding: 20px;
+            margin-top: 15px;
+            border-radius: 5px;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+        .poem-grid {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        .poem-author {
+            text-align: right;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        /* Quiz Section */
+        .quiz-section {
+            margin-top: 40px;
+        }
+        .quiz-title {
+            color: #1f2937;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .question-card {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .question-text {
+            font-size: 18px;
+            font-weight: bold;
+            color: #374151;
+            margin-bottom: 10px;
+        }
+        .options-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        @media(max-width: 600px) {
+            .options-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .option-btn {
+            background: white;
+            border: 1px solid #d1d5db;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 15px;
+            transition: all 0.2s;
+        }
+        .option-btn:hover {
+            background: #f3f4f6;
+        }
+        .option-btn.correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46;
+            font-weight: bold;
+        }
+        .option-btn.incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b;
+        }
+        .feedback-icon {
+            margin-left: 8px;
+            font-weight: bold;
+        }
+        /* Submit Button */
+        .submit-btn {
+            display: block;
+            width: 100%;
+            background-color: #10b981;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .submit-btn:hover {
+            background-color: #059669;
+        }
+        /* Result Section */
+        .result-section {
+            display: none;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .chart-container {
+            position: relative;
+            max-width: 350px;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ဆဌမတန်း မြန်မာစာ</h1>
+
+    <!-- Toggle Header -->
+    <button class="toggle-btn" onclick="togglePoem()">🌼 ပိတောက်မယ် (ကဗျာဖတ်ရန် နှိပ်ပါ) 🌼</button>
+
+    <!-- Poem Content -->
+    <div class="poem-container" id="poemContainer">
+        <div class="poem-grid">
+            <div>
+                <b>မယ်</b> - ရွှေအိုရောင်၊ လှလှသိုင်းနှင့်<br>
+                ဘယ်ကိုင်လို့၊ ညာယိုင်<br>
+                ခေါင်ခက်ဖျား မြိုင်၊<br>
+                သိကြားကိုပြိုင်၊<br>
+                တော်နိုင်မှ၊ မောင်ထွေး၊<br>
+                လက်သီးကို၊ တင်ခိုနှင့်<br>
+                ကိုရင်ပုံ၊ စီးစည်းကြီးရယ်<br>
+                ဟည်းလှတယ်လေး။<br><br>
+                <b>(၂၀ ရာစု)</b>
+            </div>
+            <div>
+                <b>မောင်</b> - ဟည်းလှမှာပေါ့၊ ဖြူလေမဆွေး<br>
+                ပိတောက်ဝါ၊ မြို့မဓလေ့မှာ<br>
+                ယူခဲ့လို့လေး။<br><br>
+                မျိုးလေး<br>
+                အို မယ်ရဲ့၊ မဟုတ်ဘူးလေမှ<br>
+                မြစိမ်း၊ ဆင်းထောက်ပိုင်<br>
+                သီကဝါ၊ ရှခေါင်ဖျား<br>
+                မင်လေ့လှလေး။<br><br>
+                <b>ဇော်ဂျီ</b>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Section -->
+    <div class="quiz-section">
+        <h2 class="quiz-title">လေ့ကျင့်ခန်း မေးခွန်းများ (Multiple Choice)</h2>
+        <div id="quizContainer"></div>
+        <button class="submit-btn" id="submitBtn" onclick="calculateResult()">ရမှတ်စစ်ဆေးမည်</button>
+    </div>
+
+    <!-- Result & Graph Section -->
+    <div class="result-section" id="resultSection">
+        <h2>သင်၏ ရမှတ်ရလဒ်</h2>
+        <p id="scoreText" style="font-size: 20px; font-weight: bold;"></p>
+        <div class="chart-container">
+            <canvas id="scoreChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Toggle Poem Visibility
+    function togglePoem() {
+        const poem = document.getElementById("poemContainer");
+        if (poem.style.display === "none" || poem.style.display === "") {
+            poem.style.display = "block";
+        } else {
+            poem.style.display = "none";
+        }
+    }
+
+    // Questions Data
+    const questions = [
+        {
+            q: "၁။ 'ပိတောက်မယ်' ကဗျာကို ရေးဖွဲ့သူမှာ မည်သူနည်း။",
+            options: ["မင်းသုဝဏ်", "ဇော်ဂျီ", "ဆရာစံ", "ငွေတာရီ"],
+            answer: 1
+        },
+        {
+            q: "၂။ ကဗျာထဲတွင် 'ရွှေအိုရောင်' ဟု တင်စားထားသည်မှာ မည်သည်နည်း။",
+            options: ["ပိတောက်ပင်", "ပိတောက်ခက်/ပိတောက်ဖူး", "စံပယ်ပန်း", "ဆွမ်းအုပ်"],
+            answer: 1
+        },
+        {
+            q: "၃။ 'ကိုရင်ပုံ' ဟူသည် မည်သည့် အဓိပ္ပာယ်နည်း။",
+            options: ["ဆွမ်းအုပ်", "ခေါင်းပေါင်း", "အဝတ်အစား", "အိုးစည်"],
+            answer: 0
+        },
+        {
+            q: "၄။ 'လှလှသိုင်း' ဆိုသည်မှာ မည်သည့် အဓိပ္ပာယ်နည်း။",
+            options: ["လှပစွာ ရစ်ဝိုင်းသည်", "ကြိုးစိုင်းသည်", "ကပြသည်", "ပြေးလွှားသည်"],
+            answer: 0
+        },
+        {
+            q: "၅။ 'သီကဝါ' ဆိုသည်မှာ မည်သည့် ပန်း/အရောင်ကို ဆိုလိုသနည်း။",
+            options: ["အဝါရောင်ပန်း", "အနီရောင်ပန်း", "အပြာရောင်ပန်း", "အဖြူရောင်ပန်း"],
+            answer: 0
+        },
+        {
+            q: "၆။ 'ခေါင်ခက်ဖျား' ၏ အဓိပ္ပာယ်မှာ မည်သည်နည်း။",
+            options: ["သစ်ပင်အောက်ခြေ", "အပင်၏ အဖျားဆုံး အခက်", "မြေကြီး", "ပင်စည်"],
+            answer: 1
+        },
+        {
+            q: "၇။ သင်္ကြန်အခါ၌ ကိုင်ဆောင်တီးခတ်လေ့ရှိသော တူရိယာမှာ မည်သည်နည်း။",
+            options: ["စောင်း", "အိုးစည်/ဒိုးပတ်", "ပတ္တလား", "နှဲ"],
+            answer: 1
+        },
+        {
+            q: "၈။ 'ဟည်းလှတယ်လေး' ဟူသည် မည်သည့် အဓိပ္ပာယ်နည်း။",
+            options: ["အသံကျယ်သည်", "အလွန်တင့်တယ်/စိမ်းလန်းသည်", "အေးစက်သည်", "မှောင်မိုက်သည်"],
+            answer: 1
+        },
+        {
+            q: "၉။ ပိတောက်ပန်းသည် မည်သည့် ရာသီ/ပွဲတော်၏ အထိမ်းအမှတ် ဖြစ်သနည်း။",
+            options: ["သီတင်းကျွတ်", "တန်ခူး/သင်္ကြန်", "တဆောင်တိုင်", "ကသုန်"],
+            answer: 1
+        },
+        {
+            q: "၁၀။ 'ပိတောက်ဝါ မြို့မဓလေ့မှာ...' ဟု မည်သူက ပြန်လည်ပြောဆိုသနည်း။",
+            options: ["မယ်", "မောင်", "လူကြီး", "ကလေး"],
+            answer: 1
+        }
+    ];
+
+    let userAnswers = new Array(questions.length).fill(null);
+
+    // Audio Context for Web Audio API (No external sound files required)
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(type) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+            // Correct Sound: High Beep Tone
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // D5
+            osc.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1); // A5
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        } else {
+            // Incorrect Sound: Low Buzz Tone
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.setValueAtTime(100, audioCtx.currentTime + 0.15);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.4);
+        }
+    }
+
+    // Render Quiz
+    function renderQuiz() {
+        const container = document.getElementById("quizContainer");
+        container.innerHTML = "";
+
+        questions.forEach((q, qIndex) => {
+            const qCard = document.createElement("div");
+            qCard.className = "question-card";
+
+            const qText = document.createElement("div");
+            qText.className = "question-text";
+            qText.innerText = q.q;
+            qCard.appendChild(qText);
+
+            const optionsDiv = document.createElement("div");
+            optionsDiv.className = "options-container";
+
+            q.options.forEach((opt, optIndex) => {
+                const btn = document.createElement("button");
+                btn.className = "option-btn";
+                btn.id = `q_${qIndex}_opt_${optIndex}`;
+                btn.innerText = opt;
+                btn.onclick = () => selectOption(qIndex, optIndex);
+                optionsDiv.appendChild(btn);
+            });
+
+            qCard.appendChild(optionsDiv);
+            container.appendChild(qCard);
+        });
+    }
+
+    // Select Option & Handle Sound / Feedback
+    function selectOption(qIndex, optIndex) {
+        // Prevent re-selection after answering
+        if (userAnswers[qIndex] !== null) return;
+
+        userAnswers[qIndex] = optIndex;
+        const correctIndex = questions[qIndex].answer;
+        const selectedBtn = document.getElementById(`q_${qIndex}_opt_${optIndex}`);
+
+        if (optIndex === correctIndex) {
+            // Correct Answer
+            selectedBtn.classList.add("correct");
+            selectedBtn.innerHTML += ' <span class="feedback-icon">✔</span>';
+            playSound('correct');
+        } else {
+            // Incorrect Answer
+            selectedBtn.classList.add("incorrect");
+            selectedBtn.innerHTML += ' <span class="feedback-icon">✖</span>';
+            
+            // Show correct answer
+            const correctBtn = document.getElementById(`q_${qIndex}_opt_${correctIndex}`);
+            correctBtn.classList.add("correct");
+            correctBtn.innerHTML += ' <span class="feedback-icon">✔</span>';
+            playSound('incorrect');
+        }
+
+        // Disable all options for this question
+        questions[qIndex].options.forEach((_, i) => {
+            document.getElementById(`q_${qIndex}_opt_${i}`).disabled = true;
+        });
+    }
+
+    // Calculate Result & Show Graph
+    function calculateResult() {
+        let correctCount = 0;
+        let answeredCount = 0;
+
+        questions.forEach((q, i) => {
+            if (userAnswers[i] !== null) {
+                answeredCount++;
+                if (userAnswers[i] === q.answer) {
+                    correctCount++;
+                }
+            }
+        });
+
+        if (answeredCount < questions.length) {
+            alert("ကျေးဇူးပြု၍ မေးခွန်း အားလုံးကို ဖြေဆိုပေးပါ။");
+            return;
+        }
+
+        const incorrectCount = questions.length - correctCount;
+
+        // Display Score Text
+        const resultSection = document.getElementById("resultSection");
+        resultSection.style.display = "block";
+        document.getElementById("scoreText").innerText = `စုစုပေါင်း ၁၀ မှတ်တွင် ${correctCount} မှတ် ရရှိပါသည်။`;
+        document.getElementById("submitBtn").style.display = "none";
+
+        // Render Graph Chart.js
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['အဖြေမှန်', 'အဖြေမှား'],
+                datasets: [{
+                    data: [correctCount, incorrectCount],
+                    backgroundColor: ['#10b981', '#ef4444'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+
+        // Scroll to results
+        resultSection.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Initialize Quiz on Load
+    window.onload = renderQuiz;
+</script>
+
+</body>
+</html>
